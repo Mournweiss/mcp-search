@@ -135,7 +135,10 @@ services:
         build:
             context: ./services/mcp-server
             dockerfile: ./services/mcp-server/Containerfile
-        container_name: ${PROJECT_NAME:-mcp-search}-mcp-server
+            args:
+                - IMAGE_NAME=${REGISTRY_MCP:-docker.io/library/python}
+                - IMAGE_VERSION=${VERSION_MCP:-3.14-slim}
+        container_name: ${PROJECT_NAME:-mcp-search}-server
         restart: unless-stopped
         ports:
             - "${MCP_PORT:-8000}:8000"

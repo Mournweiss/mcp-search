@@ -1,5 +1,14 @@
-FROM python:3.14-slim
+ARG IMAGE_NAME
+ARG IMAGE_VERSION
+FROM ${IMAGE_NAME}:${IMAGE_VERSION}
 
 WORKDIR /app
 
-CMD ["python", "-m", "src.app"]
+RUN pip install poetry
+
+COPY pyproject.toml .
+RUN poetry install --no-dev
+
+COPY . .
+
+CMD ["poetry", "run", "python", "-m", "mcp-search.main"]

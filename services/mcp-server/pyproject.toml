@@ -2,7 +2,7 @@
 name = "mcp-search-server"
 version = "0.1.0"
 description = "MCP Search Server for SearxNG and Firecrawl integration"
-authors = ["Mournweiss"]
+authors = ["Maxim Selin"]
 
 [tool.poetry.dependencies]
 python = "^3.14"
@@ -11,6 +11,8 @@ uvicorn = {version = "^0.44.0", extras = ["standard"]}
 httpx = "^0.28.1"
 pydantic = "^2.12.5"
 mcp = "^1.27.0"
+aioredis = "^2.0.1"
+pydantic-settings = "^2.13.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.3"
@@ -25,3 +27,10 @@ build-backend = "poetry.core.masonry.api"
 host = "0.0.0.0"
 port = 8000
 log-level = "info"
+
+[tool.setuptools.packages.find]
+where = "src"
+include = ["mcp-search*"]
+
+[tool.setuptools.package-dir]
+"mcp-search" = "src/mcp-search"
