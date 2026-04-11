@@ -1,0 +1,189 @@
+services:
+    searxng:
+        build:
+            context: ./services/searxng
+            dockerfile: ./services/searxng/Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_SEARXNG:-docker.io/searxng/searxng}
+                - IMAGE_VERSION=${VERSION_SEARXNG:-latest}
+        container_name: ${PROJECT_NAME:-mcp-search}-searxng
+        restart: unless-stopped
+        ports:
+            - "${SEARXNG_PORT:-8080}:8080"
+        environment:
+            - SEARXNG_BASE_URL=${SEARXNG_BASE_URL:-http://localhost:8080}
+            - SEARXNG_SETTINGS_PATH=${SEARXNG_SETTINGS_PATH:-/etc/searxng/settings.yml}
+            - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY:-your-secret-here}
+            - SEARXNG_DEBUG=${SEARXNG_DEBUG:-false}
+            - SEARXNG_INSTANCE_NAME=${SEARXNG_INSTANCE_NAME:-MCP Search Instance}
+            - SEARXNG_USE_DEFAULT_SETTINGS=${SEARXNG_USE_DEFAULT_SETTINGS:-true}
+            - SEARXNG_LIMITER_ENABLED=${SEARXNG_LIMITER_ENABLED:-true}
+            - GRANIAN_WORKERS=${GRANIAN_WORKERS:-2}
+            - GRANIAN_WORKER_THREADS=${GRANIAN_WORKER_THREADS:-4}
+            - GRANIAN_LOG_LEVEL=${GRANIAN_LOG_LEVEL:-warning}
+            - FORCE_OWNERSHIP=${FORCE_OWNERSHIP:-true}
+        volumes:
+            - ./services/searxng/settings.yml:/etc/searxng/settings.yml:ro
+            - ./services/searxng/limiter.toml:/etc/searxng/limiter.toml:ro
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+    redis:
+        build:
+            context: ./services/redis
+            dockerfile: ./services/redis/Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_REDIS:-docker.io/redis}
+                - IMAGE_VERSION=${VERSION_REDIS:-7-alpine}
+        container_name: ${PROJECT_NAME:-mcp-search}-redis
+        restart: unless-stopped
+        volumes:
+            - redis_data:/data
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+    postgres:
+        build:
+            context: ./services/postgres
+            dockerfile: ./services/postgres/Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_POSTGRES:-docker.io/postgres}
+                - IMAGE_VERSION=${VERSION_POSTGRES:-16-alpine}
+        container_name: ${PROJECT_NAME:-mcp-search}-postgres
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER:-firecrawl}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your-secret-here}
+            - POSTGRES_DB=${POSTGRES_DB:-firecrawl}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-firecrawl} -d ${POSTGRES_DB:-firecrawl}"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 20s
+
+    firecrawl:
+        build:
+            context: ./services/firecrawl
+            dockerfile: ./services/firecrawl/Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_FIRECRAWL:-docker.io/firecrawl/firecrawl}
+                - IMAGE_VERSION=${VERSION_FIRECRAWL:-latest}
+        container_name: ${PROJECT_NAME:-mcp-search}-firecrawl
+        restart: unless-stopped
+        ports:
+            - "${FIRECRAWL_PORT:-3000}:3000"
+        environment:
+            - PORT=${FIRECRAWL_PORT:-3000}
+            - HOST=${FIRECRAWL_HOST:-0.0.0.0}
+            - NODE_ENV=production
+            - USE_DB_AUTHENTICATION=${USE_DB_AUTHENTICATION:-false}
+            - POSTGRES_URL=${POSTGRES_URL:-postgresql://${POSTGRES_USER:-firecrawl}:${POSTGRES_PASSWORD:-firecrawl_secure_password}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-firecrawl}}
+            - REDIS_URL=${REDIS_URL:-redis://redis:${REDIS_PORT:-6379}}
+            - REDIS_RATE_LIMIT_URL=${REDIS_RATE_LIMIT_URL:-redis://redis:${REDIS_PORT:-6379}}
+            - REDIS_DB=${REDIS_DB:-0}
+            - PLAYWRIGHT_MICROSERVICE_URL=${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
+            - BULL_AUTH_KEY=${BULL_AUTH_KEY:-your-secret-here}
+            - TEST_API_KEY=${TEST_API_KEY:-}
+            - SEARXNG_ENDPOINT=${SEARXNG_ENDPOINT:-http://searxng:${SEARXNG_PORT:-8080}}
+            - SEARXNG_ENGINES=${SEARXNG_ENGINES:-google,duckduckgo,bing}
+            - SEARXNG_CATEGORIES=${SEARXNG_CATEGORIES:-general,it,science}
+            - PROXY_SERVER=${PROXY_SERVER:-}
+            - PROXY_USERNAME=${PROXY_USERNAME:-}
+            - PROXY_PASSWORD=${PROXY_PASSWORD:-}
+            - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+            - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+            - MODEL_NAME=${MODEL_NAME:-gpt-4o-mini}
+            - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-}
+            - MODEL_EMBEDDING_NAME=${MODEL_EMBEDDING_NAME:-}
+            - MAX_CPU=${MAX_CPU:-0.8}
+            - MAX_RAM=${MAX_RAM:-0.8}
+            - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+            - POSTHOG_API_KEY=${POSTHOG_API_KEY:-}
+            - POSTHOG_HOST=${POSTHOG_HOST:-https://app.posthog.com}
+            - ALLOW_LOCAL_WEBHOOKS=${ALLOW_LOCAL_WEBHOOKS:-false}
+        depends_on:
+            redis:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 60s
+
+    mcp-server:
+        build:
+            context: ./services/mcp-server
+            dockerfile: ./services/mcp-server/Containerfile
+        container_name: ${PROJECT_NAME:-mcp-search}-mcp-server
+        restart: unless-stopped
+        ports:
+            - "${MCP_PORT:-8000}:8000"
+        environment:
+            - MCP_PORT=${MCP_PORT:-8000}
+            - MCP_TRANSPORT=${MCP_TRANSPORT:-http}
+            - MCP_HTTP_HOST=${MCP_HTTP_HOST:-0.0.0.0}
+            - LOG_LEVEL=${LOG_LEVEL:-info}
+            - LOG_FORMAT=${LOG_FORMAT:-json}
+            - SEARXNG_URL=${SEARXNG_URL:-http://searxng:${SEARXNG_PORT:-8080}}
+            - FIRECRAWL_URL=${FIRECRAWL_URL:-http://firecrawl:${FIRECRAWL_PORT:-3000}}
+            - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30}
+            - CONNECT_TIMEOUT=${CONNECT_TIMEOUT:-10}
+            - REQUEST_RETRY_COUNT=${REQUEST_RETRY_COUNT:-3}
+            - REQUEST_RETRY_DELAY=${REQUEST_RETRY_DELAY:-1}
+            - MAX_CONCURRENT_REQUESTS=${MAX_CONCURRENT_REQUESTS:-10}
+            - MAX_QUEUE_SIZE=${MAX_QUEUE_SIZE:-100}
+            - MCP_API_KEY=${MCP_API_KEY:-}
+            - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+            - ENABLE_RATE_LIMITING=${ENABLE_RATE_LIMITING:-true}
+            - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-60}
+            - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+            - LOG_FILE_PATH=${LOG_FILE_PATH:-}
+            - ENABLE_REQUEST_LOGGING=${ENABLE_REQUEST_LOGGING:-true}
+            - ENABLE_RESPONSE_LOGGING=${ENABLE_RESPONSE_LOGGING:-false}
+            - ENABLE_WEB_SEARCH=${ENABLE_WEB_SEARCH:-true}
+            - ENABLE_WEB_CRAWL=${ENABLE_WEB_CRAWL:-true}
+            - ENABLE_CONTENT_EXTRACT=${ENABLE_CONTENT_EXTRACT:-true}
+        depends_on:
+            searxng:
+                condition: service_healthy
+            firecrawl:
+                condition: service_healthy
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+
+networks:
+    mcp-network:
+        driver: bridge
+
+volumes:
+    redis_data:
+        driver: local
+    postgres_data:
+        driver: local

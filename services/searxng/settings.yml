@@ -1,0 +1,42 @@
+general:
+    instance_name: "mcp-search-searxng"
+    debug: false
+
+server:
+    image_proxy: false
+
+ui:
+    default_theme: simple
+    default_locale: en
+
+search:
+    safe_search: 0
+    formats:
+        - html
+        - json
+
+outgoing:
+    request_timeout: 3.0
+    max_request_timeout: 10.0
+    useragent: "MCP-Search/1.0"
+
+engines:
+    - name: duckduckgo
+      engine: duckduckgo
+      categories: general
+      shortcut: ddg
+
+    - name: google
+      engine: google
+      categories: general
+      shortcut: g
+
+    - name: bing
+      engine: bing
+      categories: general
+      shortcut: b
+
+    - name: startpage
+      engine: startpage
+      categories: general
+      shortcut: sp

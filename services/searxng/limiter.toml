@@ -1,0 +1,15 @@
+[botdetection.ip_limit]
+link_token = false
+
+[botdetection.ip_lists]
+pass_searxng_org = false
+
+[limiter]
+enabled = true
+
+[limiter.config]
+limit = "100/1m"
+
+[[limiter.rules]]
+path = "/search"
+limit = "50/1m"
