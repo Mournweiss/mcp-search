@@ -58,6 +58,17 @@ generate_bull_auth_key() {
     generate_hex 32
 }
 
+# Generates RabbitMQ password
+#
+# Parameters:
+# - None
+#
+# Returns:
+# - string: generated RabbitMQ password
+generate_rabbitmq_password() {
+    generate_hex 32
+}
+
 # Main orchestration entrypoint
 #
 # Parameters:
@@ -84,6 +95,7 @@ main() {
             echo "SEARXNG_SECRET_KEY=$(generate_searxng_secret_key)"
             echo "POSTGRES_PASSWORD=$(generate_postgres_password)"
             echo "BULL_AUTH_KEY=$(generate_bull_auth_key)"
+            echo "RABBITMQ_DEFAULT_PASS=$(generate_rabbitmq_password)"
             ;;
         *)
             echo "Usage: $0 [redis_password|searxng_secret_key|postgres_password|bull_auth_key|all]"

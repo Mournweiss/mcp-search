@@ -2,7 +2,7 @@ services:
     searxng:
         build:
             context: ./services/searxng
-            dockerfile: ./services/searxng/Containerfile
+            dockerfile: Containerfile
             args:
                 - IMAGE_NAME=${REGISTRY_SEARXNG:-docker.io/searxng/searxng}
                 - IMAGE_VERSION=${VERSION_SEARXNG:-latest}
@@ -23,28 +23,28 @@ services:
             - GRANIAN_LOG_LEVEL=${GRANIAN_LOG_LEVEL:-warning}
             - FORCE_OWNERSHIP=${FORCE_OWNERSHIP:-true}
         volumes:
-            - ./services/searxng/settings.yml:/etc/searxng/settings.yml:ro
-            - ./services/searxng/limiter.toml:/etc/searxng/limiter.toml:ro
+            - ./services/searxng/settings.yml:/etc/searxng/settings.yml
+            - ./services/searxng/limiter.toml:/etc/searxng/limiter.toml
         networks:
             - mcp-network
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+            test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz"]
             interval: 30s
             timeout: 10s
             retries: 3
-            start_period: 40s
+            start_period: 60s
 
     redis:
         build:
             context: ./services/redis
-            dockerfile: ./services/redis/Containerfile
+            dockerfile: Containerfile
             args:
                 - IMAGE_NAME=${REGISTRY_REDIS:-docker.io/redis}
                 - IMAGE_VERSION=${VERSION_REDIS:-7-alpine}
         container_name: ${PROJECT_NAME:-mcp-search}-redis
         restart: unless-stopped
         volumes:
-            - redis_data:/data
+            - ./services/redis/redis_data:/data
         networks:
             - mcp-network
         healthcheck:
@@ -53,21 +53,24 @@ services:
             timeout: 5s
             retries: 3
 
-    postgres:
+    nuq-postgres:
         build:
-            context: ./services/postgres
-            dockerfile: ./services/postgres/Containerfile
+            context: ./services/nuq-postgres
+            dockerfile: Containerfile
             args:
-                - IMAGE_NAME=${REGISTRY_POSTGRES:-docker.io/postgres}
-                - IMAGE_VERSION=${VERSION_POSTGRES:-16-alpine}
-        container_name: ${PROJECT_NAME:-mcp-search}-postgres
+                - IMAGE_NAME=${REGISTRY_POSTGRES:-ghcr.io/firecrawl/nuq-postgres}
+                - IMAGE_VERSION=${VERSION_POSTGRES:-latest}
+                - DB_NAME=${POSTGRES_DB:-firecrawl}
+        container_name: ${PROJECT_NAME:-mcp-search}-nuq-postgres
         restart: unless-stopped
         environment:
             - POSTGRES_USER=${POSTGRES_USER:-firecrawl}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your-secret-here}
             - POSTGRES_DB=${POSTGRES_DB:-firecrawl}
+            - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --locale=C
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - ./services/nuq-postgres/pgdata:/var/lib/postgresql/data
+            - ./services/nuq-postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
         networks:
             - mcp-network
         healthcheck:
@@ -75,12 +78,58 @@ services:
             interval: 10s
             timeout: 5s
             retries: 3
-            start_period: 20s
+            start_period: 30s
+
+    playwright:
+        build:
+            context: ./services/playwright
+            dockerfile: Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_PLAYWRIGHT:-mcr.microsoft.com/playwright}
+                - IMAGE_VERSION=${VERSION_PLAYWRIGHT:-v1.58.2-noble}
+                - PLAYWRIGHT_VERSION=${PLAYWRIGHT_NPM_VERSION:-1.58.2}
+                - PLAYWRIGHT_PORT=${PLAYWRIGHT_PORT:-3000}
+                - PLAYWRIGHT_HOST=${PLAYWRIGHT_HOST:-0.0.0.0}
+        container_name: ${PROJECT_NAME:-mcp-search}-playwright
+        restart: unless-stopped
+        expose:
+            - "3000"
+        environment:
+            - PLAYWRIGHT_SERVER_PORT=${PLAYWRIGHT_PORT:-3000}
+            - PLAYWRIGHT_SERVER_HOST=${PLAYWRIGHT_HOST:-0.0.0.0}
+            - PLAYWRIGHT_VERSION=${PLAYWRIGHT_NPM_VERSION:-1.58.2}
+            - PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH:-./services/playwright/ms-playwright}
+            - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=${PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD:-0}
+            - PLAYWRIGHT_CHROMIUM_ENABLE_SANDBOX=${PLAYWRIGHT_CHROMIUM_ENABLE_SANDBOX:-false}
+            - PLAYWRIGHT_FIREFOX_ENABLE_SANDBOX=${PLAYWRIGHT_FIREFOX_ENABLE_SANDBOX:-false}
+            - PLAYWRIGHT_WEBKIT_ENABLE_SANDBOX=${PLAYWRIGHT_WEBKIT_ENABLE_SANDBOX:-false}
+            - PW_TEST_CONNECT_WS_ENDPOINT=${PW_TEST_CONNECT_WS_ENDPOINT:-}
+            - PLAYWRIGHT_PROXY_SERVER=${PROXY_SERVER:-}
+            - PLAYWRIGHT_PROXY_USERNAME=${PROXY_USERNAME:-}
+            - PLAYWRIGHT_PROXY_PASSWORD=${PROXY_PASSWORD:-}
+            - DEBUG=${PLAYWRIGHT_DEBUG:-pw:api}
+            - LOG_LEVEL=${PLAYWRIGHT_LOG_LEVEL:-info}
+        user: ${PLAYWRIGHT_RUN_AS_USER:-pwuser}
+        security_opt:
+            - seccomp=${PLAYWRIGHT_SECCOMP_PROFILE:-./services/playwright/seccomp_profile.json}
+        ipc: ${PLAYWRIGHT_IPC_MODE:-host}
+        init: true
+        volumes:
+            - ${PLAYWRIGHT_BROWSERS_PATH:-./services/playwright/ms-playwright}:/ms-playwright
+            - ./services/playwright/seccomp_profile.json:/seccomp_profile.json:ro
+        networks:
+            - mcp-network
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 60s
 
     firecrawl:
         build:
             context: ./services/firecrawl
-            dockerfile: ./services/firecrawl/Containerfile
+            dockerfile: Containerfile
             args:
                 - IMAGE_NAME=${REGISTRY_FIRECRAWL:-docker.io/firecrawl/firecrawl}
                 - IMAGE_VERSION=${VERSION_FIRECRAWL:-latest}
@@ -93,11 +142,12 @@ services:
             - HOST=${FIRECRAWL_HOST:-0.0.0.0}
             - NODE_ENV=production
             - USE_DB_AUTHENTICATION=${USE_DB_AUTHENTICATION:-false}
-            - POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+            - NUQ_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@nuq-postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+            - NUQ_RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:${RABBITMQ_PORT:-5672}/
             - REDIS_URL=redis://redis:${REDIS_PORT:-6379}
             - REDIS_RATE_LIMIT_URL=redis://redis:${REDIS_PORT:-6379}
             - REDIS_DB=${REDIS_DB:-0}
-            - PLAYWRIGHT_MICROSERVICE_URL=${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
+            - PLAYWRIGHT_MICROSERVICE_URL=http://playwright:${PLAYWRIGHT_PORT:-3000}/scrape
             - BULL_AUTH_KEY=${BULL_AUTH_KEY:-your-secret-here}
             - TEST_API_KEY=${TEST_API_KEY:-}
             - SEARXNG_ENDPOINT=http://searxng:${SEARXNG_PORT:-8080}
@@ -120,12 +170,22 @@ services:
         depends_on:
             redis:
                 condition: service_healthy
-            postgres:
+            nuq-postgres:
+                condition: service_healthy
+            playwright:
+                condition: service_healthy
+            rabbitmq:
                 condition: service_healthy
         networks:
             - mcp-network
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+            test:
+                [
+                    "CMD",
+                    "node",
+                    "-e",
+                    "require('http').get('http://127.0.0.1:3000/e2e-test', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+                ]
             interval: 30s
             timeout: 10s
             retries: 3
@@ -134,7 +194,7 @@ services:
     mcp-server:
         build:
             context: ./services/mcp-server
-            dockerfile: ./services/mcp-server/Containerfile
+            dockerfile: Containerfile
             args:
                 - IMAGE_NAME=${REGISTRY_MCP:-docker.io/library/python}
                 - IMAGE_VERSION=${VERSION_MCP:-3.14-slim}
@@ -181,6 +241,45 @@ services:
             retries: 3
             start_period: 30s
 
+    rabbitmq:
+        build:
+            context: ./services/rabbitmq
+            dockerfile: Containerfile
+            args:
+                - IMAGE_NAME=${REGISTRY_RABBITMQ:-docker.io/rabbitmq}
+                - IMAGE_VERSION=${VERSION_RABBITMQ:-3-management}
+        container_name: ${PROJECT_NAME:-mcp-search}-rabbitmq
+        restart: unless-stopped
+        ports:
+            - "${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}"
+            - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-firecrawl}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-your-rabbitmq-password}
+            - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+            - RABBITMQ_NODE_PORT=${RABBITMQ_PORT:-5672}
+            - RABBITMQ_DIST_PORT=${RABBITMQ_DIST_PORT:-25672}
+            - RABBITMQ_NODENAME=${RABBITMQ_NODENAME:-rabbit@rabbitmq}
+            - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS:-}
+            - RABBITMQ_PLUGINS=${RABBITMQ_PLUGINS:-rabbitmq_management}
+            - RABBITMQ_LOG_BASE=${RABBITMQ_LOG_BASE:-/var/log/rabbitmq}
+            - RABBITMQ_MNESIA_BASE=${RABBITMQ_MNESIA_BASE:-/var/lib/rabbitmq/mnesia}
+        networks:
+            - mcp-network
+        volumes:
+            - ./services/rabbitmq/rabbitmq_data:/var/lib/rabbitmq
+        healthcheck:
+            test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+            interval: 5s
+            timeout: 5s
+            retries: 12
+            start_period: 10s
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+
 networks:
     mcp-network:
         driver: bridge
@@ -188,5 +287,9 @@ networks:
 volumes:
     redis_data:
         driver: local
-    postgres_data:
+    nuq_postgres_data:
+        driver: local
+    playwright_browsers:
+        driver: local
+    rabbitmq_data:
         driver: local

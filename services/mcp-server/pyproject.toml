@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "mcp-search-server"
+name = "mcp_search"
 version = "0.1.0"
 description = "MCP Search Server for SearxNG and Firecrawl integration"
 authors = ["Maxim Selin"]
+packages = [{include = "mcp_search", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.14"
@@ -27,10 +28,3 @@ build-backend = "poetry.core.masonry.api"
 host = "0.0.0.0"
 port = 8000
 log-level = "info"
-
-[tool.setuptools.packages.find]
-where = "src"
-include = ["mcp-search*"]
-
-[tool.setuptools.package-dir]
-"mcp-search" = "src/mcp-search"

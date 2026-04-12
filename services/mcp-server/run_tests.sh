@@ -57,14 +57,14 @@ run_with_coverage() {
     if [ "$VERBOSE" = true ]; then
         poetry run pytest \
             --verbose \
-            --cov=src/mcp-search \
+            --cov=src/mcp_search \
             --cov-report=term-missing \
             --cov-report=html:coverage_html_report \
             --cov-report=xml:coverage.xml \
             $TEST_PATH
     else
         poetry run pytest \
-            --cov=src/mcp-search \
+            --cov=src/mcp_search \
             --cov-report=term-missing \
             --cov-report=html:coverage_html_report \
             --cov-report=xml:coverage.xml \

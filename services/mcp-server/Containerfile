@@ -6,9 +6,7 @@ WORKDIR /app
 
 RUN pip install poetry
 
-COPY pyproject.toml .
-RUN poetry install --no-dev
-
 COPY . .
+RUN poetry install
 
-CMD ["poetry", "run", "python", "-m", "mcp-search.main"]
+CMD ["poetry", "run", "python", "-m", "mcp_search.main"]

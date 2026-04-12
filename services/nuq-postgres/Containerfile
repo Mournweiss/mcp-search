@@ -1,0 +1,19 @@
+ARG IMAGE_NAME
+ARG IMAGE_VERSION
+FROM ${IMAGE_NAME}:${IMAGE_VERSION}
+
+ENV NUQ_DB_NAME=firecrawl
+ENV PG_MAJOR=17
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends postgresql-contrib && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN printf "\n# Firecrawl NUQ config\nshared_preload_libraries = 'pg_cron'\ncron.database_name = '%s'\ncron.host = 'localhost'\n" "${NUQ_DB_NAME}" \
+    >> /usr/share/postgresql/${PG_MAJOR}/postgresql.conf.sample
+
+COPY --chmod=0644 nuq.sql /docker-entrypoint-initdb.d/010-nuq.sql
+
+EXPOSE 5432
+WORKDIR /var/lib/postgresql/data
+CMD ["postgres"]

@@ -28,6 +28,12 @@ Thumbs.db
 *.tar.gz
 *.tgz
 
+# Services data
+**/pgdata/
+**/redis_data/
+**/rabbitmq_data/
+**/ms-playwright/
+
 # Misc
 *.iml
 *.crt

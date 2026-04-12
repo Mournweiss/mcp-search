@@ -1,7 +1,3 @@
 ARG IMAGE_NAME
 ARG IMAGE_VERSION
 FROM ${IMAGE_NAME}:${IMAGE_VERSION}
-
-WORKDIR /app
-
-CMD ["python", "-m", "searxng"]
