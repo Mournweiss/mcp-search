@@ -11,7 +11,7 @@ services:
         ports:
             - "${SEARXNG_PORT:-8080}:8080"
         environment:
-            - SEARXNG_BASE_URL=${SEARXNG_BASE_URL:-http://localhost:8080}
+            - SEARXNG_BASE_URL=http://localhost:${SEARXNG_PORT:-8080}
             - SEARXNG_SETTINGS_PATH=${SEARXNG_SETTINGS_PATH:-/etc/searxng/settings.yml}
             - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY:-your-secret-here}
             - SEARXNG_DEBUG=${SEARXNG_DEBUG:-false}
@@ -93,22 +93,22 @@ services:
             - HOST=${FIRECRAWL_HOST:-0.0.0.0}
             - NODE_ENV=production
             - USE_DB_AUTHENTICATION=${USE_DB_AUTHENTICATION:-false}
-            - POSTGRES_URL=${POSTGRES_URL:-postgresql://${POSTGRES_USER:-firecrawl}:${POSTGRES_PASSWORD:-firecrawl_secure_password}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-firecrawl}}
-            - REDIS_URL=${REDIS_URL:-redis://redis:${REDIS_PORT:-6379}}
-            - REDIS_RATE_LIMIT_URL=${REDIS_RATE_LIMIT_URL:-redis://redis:${REDIS_PORT:-6379}}
+            - POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+            - REDIS_URL=redis://redis:${REDIS_PORT:-6379}
+            - REDIS_RATE_LIMIT_URL=redis://redis:${REDIS_PORT:-6379}
             - REDIS_DB=${REDIS_DB:-0}
             - PLAYWRIGHT_MICROSERVICE_URL=${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
             - BULL_AUTH_KEY=${BULL_AUTH_KEY:-your-secret-here}
             - TEST_API_KEY=${TEST_API_KEY:-}
-            - SEARXNG_ENDPOINT=${SEARXNG_ENDPOINT:-http://searxng:${SEARXNG_PORT:-8080}}
+            - SEARXNG_ENDPOINT=http://searxng:${SEARXNG_PORT:-8080}
             - SEARXNG_ENGINES=${SEARXNG_ENGINES:-google,duckduckgo,bing}
             - SEARXNG_CATEGORIES=${SEARXNG_CATEGORIES:-general,it,science}
             - PROXY_SERVER=${PROXY_SERVER:-}
             - PROXY_USERNAME=${PROXY_USERNAME:-}
             - PROXY_PASSWORD=${PROXY_PASSWORD:-}
             - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-            - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
-            - MODEL_NAME=${MODEL_NAME:-gpt-4o-mini}
+            - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+            - MODEL_NAME=${MODEL_NAME:-}
             - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-}
             - MODEL_EMBEDDING_NAME=${MODEL_EMBEDDING_NAME:-}
             - MAX_CPU=${MAX_CPU:-0.8}
@@ -148,8 +148,8 @@ services:
             - MCP_HTTP_HOST=${MCP_HTTP_HOST:-0.0.0.0}
             - LOG_LEVEL=${LOG_LEVEL:-info}
             - LOG_FORMAT=${LOG_FORMAT:-json}
-            - SEARXNG_URL=${SEARXNG_URL:-http://searxng:${SEARXNG_PORT:-8080}}
-            - FIRECRAWL_URL=${FIRECRAWL_URL:-http://firecrawl:${FIRECRAWL_PORT:-3000}}
+            - SEARXNG_URL=http://searxng:${SEARXNG_PORT:-8080}
+            - FIRECRAWL_URL=http://firecrawl:${FIRECRAWL_PORT:-3000}
             - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-30}
             - CONNECT_TIMEOUT=${CONNECT_TIMEOUT:-10}
             - REQUEST_RETRY_COUNT=${REQUEST_RETRY_COUNT:-3}
