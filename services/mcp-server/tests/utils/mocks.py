@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from mcp_search.clients.base import BaseClient
 from mcp_search.clients.searxng import SearxNGClient
 from mcp_search.clients.firecrawl import FirecrawlClient
-from mcp_search.server.tools import MCPTools
+from mcp_search.tools.registry import ToolRegistry
 
 
 class MockBaseClient(BaseClient):
@@ -68,8 +68,8 @@ class MockFirecrawlClient(FirecrawlClient):
         return mock_response
 
 
-class MockMCPTools(MCPTools):
-    """Mock MCPTools for testing."""
+class MockToolRegistry(ToolRegistry):
+    """Mock ToolRegistry for testing."""
     
     def __init__(self):
         super().__init__()

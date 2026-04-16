@@ -13,10 +13,10 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'services', 'mcp-server', 'src'))
 
 from mcp_search.core.config import settings
-from mcp_search.clients.base import BaseClient
+from mcp_search.clients.templates import BaseClient
 from mcp_search.clients.searxng import SearxNGClient
 from mcp_search.clients.firecrawl import FirecrawlClient
-from mcp_search.server.tools import MCPTools
+from mcp_search.tools.registry import ToolRegistry
 
 
 @pytest.fixture(scope="session")
@@ -53,9 +53,9 @@ def firecrawl_client():
 
 
 @pytest.fixture(scope="function")
-def mcp_tools():
-    """Create an MCPTools instance for testing."""
-    return MCPTools()
+def tool_registry():
+    """Create a ToolRegistry instance for testing."""
+    return ToolRegistry()
 
 
 @pytest.fixture(scope="function")

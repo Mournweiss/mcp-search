@@ -5,7 +5,7 @@ Unit tests for MCP Search base HTTP client.
 import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
-from mcp_search.clients.base import BaseClient
+from mcp_search.clients.templates import BaseClient
 
 
 @pytest.mark.asyncio

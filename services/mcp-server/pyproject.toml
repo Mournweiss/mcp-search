@@ -7,12 +7,12 @@ packages = [{include = "mcp_search", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.14"
-fastapi = "^0.135.3"
+fastapi = "^0.136.0"
 uvicorn = {version = "^0.44.0", extras = ["standard"]}
 httpx = "^0.28.1"
 pydantic = "^2.12.5"
 mcp = "^1.27.0"
-aioredis = "^2.0.1"
+redis = "^7.4.0"
 pydantic-settings = "^2.13.1"
 
 [tool.poetry.group.dev.dependencies]

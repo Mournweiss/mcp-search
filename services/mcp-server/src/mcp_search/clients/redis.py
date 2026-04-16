@@ -8,24 +8,25 @@ import asyncio
 import logging
 from typing import Optional, Any, Union
 import redis.asyncio as redis
-from ..core import (
-    settings,
-    CacheError
-)
+from mcp_search.core import settings
+from mcp_search.core.exceptions import CacheError
+from .templates.base_client import BaseClient
 
 
 logger = logging.getLogger(__name__)
 
 
-class RedisClient:
+class RedisClient(BaseClient):
     """
     Client for interacting with Redis cache.
     
     Handles communication with the Redis service for caching operations.
+    Inherits from BaseClient for consistent interface and functionality.
     """
     
-    def __init__(self):
+    def __init__(self, base_url: Optional[str] = None):
         """Initialize the Redis client."""
+        super().__init__(base_url)
         self.client: Optional[redis.Redis] = None
         logger.info("Redis client initialized")
         

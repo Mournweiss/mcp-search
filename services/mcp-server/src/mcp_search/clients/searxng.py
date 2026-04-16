@@ -10,12 +10,10 @@ import logging
 from typing import List, Dict, Any, Optional
 import httpx
 
-from ..schemas import SearchResult, SearchResponse
-from .base import BaseClient
-from ..core import (
-    settings,
-    SearchError
-)
+from mcp_search.schemas import SearchResult, SearchResponse
+from mcp_search.core import settings
+from mcp_search.core.exceptions import SearchError
+from .templates import BaseClient
 
 
 logger = logging.getLogger(__name__)

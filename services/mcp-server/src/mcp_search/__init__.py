@@ -5,10 +5,9 @@ MCP Search Server package.
 __version__ = "0.1.0"
 __author__ = "Maxim Selin"
 
-from .main import main, MCPSever
-from .core import (
-    setup_logger,
-    settings,
+from .tools import ToolRegistry
+from .core import setup_logger, settings
+from .core.exceptions import (
     MCPError,
     SearchError,
     ScrapingError,
@@ -16,11 +15,16 @@ from .core import (
     ValidationError,
     RateLimitError
 )
-from .server.tools import MCPTools
+
+
+def main():
+    """Lazy access to main entry point to avoid import-time side effects."""
+    from .main import main as _main
+    return _main
+
 
 __all__ = [
     "main",
-    "MCPSever",
     "settings",
     "setup_logger",
     "MCPError",
@@ -29,5 +33,5 @@ __all__ = [
     "CacheError",
     "ValidationError",
     "RateLimitError",
-    "MCPTools"
+    "ToolRegistry"
 ]

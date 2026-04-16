@@ -81,6 +81,42 @@ class ScrapingError(MCPError):
         super().__init__(message, "SCRAPING_ERROR", details)
 
 
+class ToolRegistrationError(MCPError):
+    """
+    Exception raised when tool registration fails.
+    
+    Used when tools cannot be properly registered with the MCP server.
+    """
+    
+    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+        """
+        Initialize ToolRegistrationError.
+        
+        Args:
+            message (str): Error message
+            details (Optional[Dict[str, Any]]): Additional error details
+        """
+        super().__init__(message, "TOOL_REGISTRATION_ERROR", details)
+
+
+class ToolExecutionError(MCPError):
+    """
+    Exception raised when tool execution fails.
+    
+    Used when tools encounter problems during execution.
+    """
+    
+    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+        """
+        Initialize ToolExecutionError.
+        
+        Args:
+            message (str): Error message
+            details (Optional[Dict[str, Any]]): Additional error details
+        """
+        super().__init__(message, "TOOL_EXECUTION_ERROR", details)
+
+
 class CacheError(MCPError):
     """
     Exception raised when cache operations fail.

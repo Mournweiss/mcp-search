@@ -4,10 +4,10 @@ Clients package for MCP Search Server.
 Contains HTTP clients for external services.
 """
 
-from .base import BaseClient
+from .templates import BaseClient
 from .searxng import SearxNGClient
 from .firecrawl import FirecrawlClient
-from .cache import RedisClient
+from .redis import RedisClient
 
 __all__ = [
     "BaseClient",

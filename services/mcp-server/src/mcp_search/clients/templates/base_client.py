@@ -10,7 +10,7 @@ import logging
 from typing import Optional, Dict, Any, Union
 import httpx
 from pydantic import BaseModel
-from ..core import settings
+from mcp_search.core import settings
 
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class BaseClient:
     async def get(self, url: str, params: Optional[Dict[str, Any]] = None, 
                  headers: Optional[Dict[str, str]] = None) -> httpx.Response:
         """
-        Perform GET request.
+        Perform a GET request.
         
         Args:
             url (str): URL to request
@@ -58,49 +58,31 @@ class BaseClient:
             
         Returns:
             httpx.Response: Response object
-            
-        Raises:
-            httpx.RequestError: If the request fails
         """
-        try:
-            response = await self.client.get(url, params=params, headers=headers)
-            response.raise_for_status()
-            return response
-        except httpx.RequestError as e:
-            logger.error(f"GET request failed for {url}: {str(e)}")
-            raise
-            
+        return await self.client.get(url, params=params, headers=headers)
+        
     async def post(self, url: str, data: Optional[Dict[str, Any]] = None,
-                  json_data: Optional[Dict[str, Any]] = None,
+                  json: Optional[Dict[str, Any]] = None,
                   headers: Optional[Dict[str, str]] = None) -> httpx.Response:
         """
-        Perform POST request.
+        Perform a POST request.
         
         Args:
             url (str): URL to request
             data (Optional[Dict[str, Any]]): Form data
-            json_data (Optional[Dict[str, Any]]): JSON data
+            json (Optional[Dict[str, Any]]): JSON data
             headers (Optional[Dict[str, str]]): Request headers
             
         Returns:
             httpx.Response: Response object
-            
-        Raises:
-            httpx.RequestError: If the request fails
         """
-        try:
-            response = await self.client.post(url, data=data, json=json_data, headers=headers)
-            response.raise_for_status()
-            return response
-        except httpx.RequestError as e:
-            logger.error(f"POST request failed for {url}: {str(e)}")
-            raise
-            
-    async def close(self):
-        """Close the HTTP client connection."""
-        await self.client.aclose()
-        logger.info("Base client closed")
+        return await self.client.post(url, data=data, json=json, headers=headers)
         
+    async def close(self):
+        """Close the HTTP client."""
+        if self.client:
+            await self.client.aclose()
+            
     async def __aenter__(self):
         """Async context manager entry."""
         return self

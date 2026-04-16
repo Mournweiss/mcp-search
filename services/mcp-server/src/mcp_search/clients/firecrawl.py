@@ -10,12 +10,10 @@ import logging
 from typing import List, Dict, Any, Optional
 import httpx
 
-from ..schemas import ScrapingResult, ScrapeResponse
-from .base import BaseClient
-from ..core import (
-    settings,
-    ScrapingError
-)
+from mcp_search.schemas import ScrapingResult, ScrapeResponse
+from mcp_search.core import settings
+from mcp_search.core.exceptions import ScrapingError
+from .templates import BaseClient
 
 
 logger = logging.getLogger(__name__)
