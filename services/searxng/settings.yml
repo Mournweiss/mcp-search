@@ -62,6 +62,12 @@ engines:
       shortcut: ah
       disabled: true
 
+    - name: wikidata
+      engine: wikidata
+      categories: general
+      shortcut: wd
+      disabled: true
+
     - name: torch
       engine: xpath
       categories: onions

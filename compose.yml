@@ -14,6 +14,7 @@ services:
             - SEARXNG_BASE_URL=http://localhost:${SEARXNG_PORT:-8080}
             - SEARXNG_SETTINGS_PATH=${SEARXNG_SETTINGS_PATH:-/etc/searxng/settings.yml}
             - SEARXNG_SECRET_KEY=${SEARXNG_SECRET_KEY:-your-secret-here}
+            - SEARXNG_USE_X_FORWARDED_HOST=true
             - SEARXNG_DEBUG=${SEARXNG_DEBUG:-false}
             - SEARXNG_INSTANCE_NAME=${SEARXNG_INSTANCE_NAME:-MCP Search Instance}
             - SEARXNG_USE_DEFAULT_SETTINGS=${SEARXNG_USE_DEFAULT_SETTINGS:-true}
