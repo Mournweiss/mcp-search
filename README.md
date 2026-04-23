@@ -85,17 +85,17 @@ The script will:
 --docker, -d          Use docker-compose explicitly
 --foreground, -f      Run in foreground mode (attach logs)
 --no-keygen, -n       Skip secret generation
---help, -h            Show this help message
+--help, -h            Show help message
 ```
 
 3. Connect to LLM:
 
-    > Both MCP servers run as streamable HTTP endpoints.
-    >
-    > | Server            | Endpoint                     | Transport       |
-    > | ----------------- | ---------------------------- | --------------- |
-    > | **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
-    > | **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
+      Both MCP servers run as streamable HTTP endpoints.
+    
+      | Server            | Endpoint                     | Transport       |
+      | ----------------- | ---------------------------- | --------------- |
+      | **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
+      | **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
 
 #### Claude Desktop
 
