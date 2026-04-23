@@ -4,15 +4,16 @@
 
 Containerized search and web scraping infrastructure powered by Model Context Protocol
 
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-8A35AE?logo=docker&logoColor=fff)](https://docs.docker.com/compose/)
-[![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=fff)](https://github.com/redis/redis)
-[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?logo=rabbitmq&logoColor=fff)](https://github.com/rabbitmq/rabbitmq-server)
-[![SearXNG](https://img.shields.io/badge/SearXNG-4A63A0?logo=firefox&logoColor=fff)](https://github.com/searxng/searxng)
-[![mcp--searxng](https://img.shields.io/badge/mcp--searxng-68A0EB?logo=typescript&logoColor=fff)](https://github.com/ihor-sokoliuk/mcp-searxng)
-[![Firecrawl](https://img.shields.io/badge/Firecrawl-F6430E?logo=firefox&logoColor=fff)](https://github.com/firecrawl/firecrawl)
-[![firecrawl--mcp--server](https://img.shields.io/badge/firecrawl--mcp--server-FFD800?logo=typescript&logoColor=333)](https://github.com/firecrawl/firecrawl-mcp-server)
-[![Playwright](https://img.shields.io/badge/Playwright-28A8E5?logo=playwright&logoColor=fff)](https://github.com/microsoft/playwright)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg?style=for-the-badge&logoWidth=40)](LICENSE)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-8A35AE?style=for-the-badge&logoWidth=40&logo=docker&logoColor=fff)](https://docs.docker.com/compose/)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logoWidth=40&logo=redis&logoColor=fff)](https://github.com/redis/redis)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logoWidth=40&logo=rabbitmq&logoColor=fff)](https://github.com/rabbitmq/rabbitmq-server)
+[![SearXNG](https://img.shields.io/badge/SearXNG-4A63A0?style=for-the-badge&logoWidth=40&logo=firefox&logoColor=fff)](https://github.com/searxng/searxng)
+[![mcp--searxng](https://img.shields.io/badge/mcp--searxng-68A0EB?style=for-the-badge&logoWidth=40&logo=typescript&logoColor=fff)](https://github.com/ihor-sokoliuk/mcp-searxng)
+[![Firecrawl](https://img.shields.io/badge/Firecrawl-F6430E?style=for-the-badge&logoWidth=40&logo=firefox&logoColor=fff)](https://github.com/firecrawl/firecrawl)
+[![firecrawl--mcp--server](https://img.shields.io/badge/firecrawl--mcp--server-FFD800?style=for-the-badge&logoWidth=40&logo=typescript&logoColor=333)](https://github.com/firecrawl/firecrawl-mcp-server)
+[![Playwright](https://img.shields.io/badge/Playwright-28A8E5?style=for-the-badge&logoWidth=40&logo=playwright&logoColor=fff)](https://github.com/microsoft/playwright)
+[![Model Context Protocol](https://img.shields.io/badge/Model%20Context%20Protocol-000000?style=for-the-badge&logoWidth=40&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTEyIDJMMiA3bDEwIDUgMTAtNS0xMC01em0wIDlsLTEwIDUgMTAgNSAxMC01LTEwLTV6Ii8+PC9zdmc+)](https://modelcontextprotocol.io/)
 
 </div>
 
@@ -201,7 +202,7 @@ Reload the Windsurf window after saving.
 
 All configuration is managed through `.env`. See `.env.example` for the full list of variables.
 
-Key variables:
+Primary variables:
 
 | Variable                   | Default                  | Description                   |
 | -------------------------- | ------------------------ | ----------------------------- |
