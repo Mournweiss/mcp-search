@@ -89,12 +89,12 @@ The script will:
 
 3. Connect to LLM:
 
-Both MCP servers run as streamable HTTP endpoints.
-
-| Server            | Endpoint                     | Transport       |
-| ----------------- | ---------------------------- | --------------- |
-| **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
-| **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
+    > Both MCP servers run as streamable HTTP endpoints.
+    >
+    > | Server            | Endpoint                     | Transport       |
+    > | ----------------- | ---------------------------- | --------------- |
+    > | **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
+    > | **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
 
 #### Claude Desktop
 
@@ -137,8 +137,6 @@ Cursor supports native HTTP transport:
     }
 }
 ```
-
-In a chat session, switch to **Agent mode** for automatic tool discovery.
 
 #### VS Code (GitHub Copilot)
 
