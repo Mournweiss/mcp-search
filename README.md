@@ -37,23 +37,26 @@ graph TD
 
 ### Services
 
-| Service           | Image                            | Port         | Description                          |
-| ----------------- | -------------------------------- | ------------ | ------------------------------------ |
-| **searxng**       | `searxng/searxng`                | 8080         | Privacy-respecting metasearch engine |
-| **mcp-searxng**   | `isokoliuk/mcp-searxng`          | 30019        | MCP server for SearXNG API           |
-| **firecrawl**     | `ghcr.io/firecrawl/firecrawl`    | 3000         | Web scraping and crawling API        |
-| **mcp-firecrawl** | `mcp/firecrawl`                  | 30028        | MCP server for Firecrawl API         |
-| **redis**         | `redis:7-alpine`                 | 6379         | Cache and rate limiting              |
-| **nuq-postgres**  | `ghcr.io/firecrawl/nuq-postgres` | 5432         | PostgreSQL for Firecrawl             |
-| **playwright**    | `mcr.microsoft.com/playwright`   | 3000         | Headless browser for JS rendering    |
-| **rabbitmq**      | `rabbitmq:3-management`          | 5672 / 15672 | Message broker for Firecrawl         |
+| Service           | Image                            | Port         | Description                                             |
+| ----------------- | -------------------------------- | ------------ | ------------------------------------------------------- |
+| **searxng**       | `searxng/searxng`                | 8080         | Privacy-respecting metasearch engine (web UI available) |
+| **mcp-searxng**   | `isokoliuk/mcp-searxng`          | 30019        | MCP server for SearXNG API                              |
+| **firecrawl**     | `ghcr.io/firecrawl/firecrawl`    | 3000         | Web scraping and crawling API                           |
+| **mcp-firecrawl** | `mcp/firecrawl`                  | 30028        | MCP server for Firecrawl API                            |
+| **redis**         | `redis:7-alpine`                 | 6379         | Cache and rate limiting                                 |
+| **nuq-postgres**  | `ghcr.io/firecrawl/nuq-postgres` | 5432         | PostgreSQL for Firecrawl                                |
+| **playwright**    | `mcr.microsoft.com/playwright`   | 3000         | Headless browser for JS rendering                       |
+| **rabbitmq**      | `rabbitmq:3-management`          | 5672 / 15672 | Message broker for Firecrawl                            |
 
 ## Usage
 
 ### Requirements
 
-- Docker or Podman (with `docker-compose` or `podman-compose`)
-- Bash
+| Dependency                          | Minimum Version |
+| ----------------------------------- | --------------- |
+| **Docker or Podman (with compose)** | `23.0` / `5.0`  |
+| **Bash**                            | `5.0`           |
+| **OpenSSL**                         | `3.x`           |
 
 ### Quick Start
 
@@ -90,12 +93,12 @@ The script will:
 
 3. Connect to LLM:
 
-      Both MCP servers run as streamable HTTP endpoints.
-    
-      | Server            | Endpoint                     | Transport       |
-      | ----------------- | ---------------------------- | --------------- |
-      | **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
-      | **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
+    Both MCP servers run as streamable HTTP endpoints.
+
+    | Server            | Endpoint                     | Transport       |
+    | ----------------- | ---------------------------- | --------------- |
+    | **mcp-searxng**   | `http://localhost:30019/mcp` | Streamable HTTP |
+    | **mcp-firecrawl** | `http://localhost:30028/mcp` | Streamable HTTP |
 
 #### Claude Desktop
 
