@@ -18,6 +18,7 @@ compose_file="compose.yml"
 env_file=".env"
 NO_KEYGEN_MODE=false
 FOREGROUND_MODE=false
+ORCHESTRATOR="docker-compose"
 
 # Parses command-line arguments and sets global variables for orchestrator and options.
 #

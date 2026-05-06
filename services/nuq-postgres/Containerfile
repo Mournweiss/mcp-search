@@ -12,7 +12,8 @@ RUN apt-get update && \
 RUN printf "\n# Firecrawl NUQ config\nshared_preload_libraries = 'pg_cron'\ncron.database_name = '%s'\ncron.host = 'localhost'\n" "${NUQ_DB_NAME}" \
     >> /usr/share/postgresql/${PG_MAJOR}/postgresql.conf.sample
 
-COPY --chmod=0644 nuq.sql /docker-entrypoint-initdb.d/010-nuq.sql
+COPY nuq.sql /docker-entrypoint-initdb.d/010-nuq.sql
+RUN chmod 0644 /docker-entrypoint-initdb.d/010-nuq.sql
 
 EXPOSE 5432
 WORKDIR /var/lib/postgresql/data
